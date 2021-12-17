@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="image-view">
+        <canvas id="canvas" width="600" height="400"></canvas>
+        <input id="input" class="file-input" type="file" accept="image/*" />
+        <button id="download-button">ダウンロード</button>
+        <div class="text-control">
+          <form id="form" class="form">
+            <input class="form__textarea" type="text" />
+            <button>テキストを描画</button>
+          </form>
+        </div>
+        <div class="image-control">
+          <div class="button-group">
+            <button data-translate="up">上へ</button>
+            <button data-translate="down">下へ</button>
+            <button data-translate="left">左へ</button>
+            <button data-translate="right">右へ</button>
+          </div>
+          <div class="button-group button-group--small">
+            <button data-rotate="right">右回転</button>
+            <button data-rotate="left">左回転</button>
+          </div>
+          <div class="button-group button-group--small">
+            <button data-scale="up">拡大</button>
+            <button data-scale="down">縮小</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+.wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.image-view {
+  position: relative;
+}
+
+canvas {
+  display: block;
+  border: 1px solid #000;
+  margin-bottom: 24px;
+}
+
+.file-input {
+  margin-bottom: 40px;
+}
+
+.text-control {
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+}
+
+.form__textarea {
+  margin-right: 24px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-group--small {
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.button-group:not(:last-child) {
+  margin-bottom: 24px;
+}
+
+button {
+  font-size: 16px;
+  min-width: 120px;
+  min-height: 40px;
+  cursor: pointer;
+}
