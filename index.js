@@ -9,30 +9,45 @@ const calculateRadian = (degrees) => (Math.PI / 180) * degrees;
 let image = new Image();
 
 class CanvasView {
-  constructor(canvas, context, image) {
+  constructor(canvas, context) {
     this.canvas = canvas;
     /**
      * @type {CanvasRenderingContext2D}
      */
     this.context = context;
+  }
+
+  translate(dx, dy) {
+    this.dx += dx;
+    this.dy += dy;
+  }
+
+  rotate(degrees) {
+    this.degrees += degrees;
+  }
+
+  scale(magnification) {
+    this.mx += magnification;
+    this.my += magnification;
+    if (this.mx < 0.1 && this.my < 0.1) {
+      this.mx = 0.1;
+      this.my = 0.1;
+    }
+  }
+}
+
+class CanvasImage extends CanvasView {
+  constructor(canvas, context, image) {
+    super(canvas, context);
+
     this.image = image;
-    this.x1 = 0;
-    this.y1 = 0;
-    this.dx1 = 0;
-    this.dy1 = 0;
-    this.degrees1 = 0;
-    this.mx1 = 1.0;
-    this.my1 = 1.0;
-
-    this.text = '';
-    this.x2 = 40;
-    this.y2 = this.canvas.height / 2;
-    this.size = 80;
-    this.font = 'serif';
-
-    this.image.onload = () => {
-      this.draw();
-    };
+    this.x = 0;
+    this.y = 0;
+    this.dx = 0;
+    this.dy = 0;
+    this.degrees = 0;
+    this.mx = 1.0;
+    this.my = 1.0;
   }
 
   load(file) {
@@ -43,35 +58,18 @@ class CanvasView {
     };
   }
 
-  clear() {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  drawImage() {
-    this.context.save();
-    this.context.translate(this.dx1, this.dy1);
-    this.context.translate(
-      this.image.width / 2 + this.dx1,
-      this.image.height / 2 + this.dy1
-    );
-    this.context.rotate(calculateRadian(this.degrees1));
-    this.context.scale(this.mx1, this.my1);
-    this.context.translate(-this.image.width / 2, -this.image.height / 2);
-    this.context.drawImage(this.image, this.x1, this.y1);
-    this.context.restore();
-  }
-
-  drawText() {
-    this.context.save();
-    this.context.font = `${this.size}px ${this.font}`;
-    this.context.fillText(this.text, this.x2, this.y2);
-    this.context.restore();
-  }
-
   draw() {
-    this.clear();
-    this.drawImage();
-    this.drawText();
+    this.context.save();
+    this.context.translate(this.dx, this.dy);
+    this.context.translate(
+      this.image.width / 2 + this.dx,
+      this.image.height / 2 + this.dy
+    );
+    this.context.rotate(calculateRadian(this.degrees));
+    this.context.scale(this.mx, this.my);
+    this.context.translate(-this.image.width / 2, -this.image.height / 2);
+    this.context.drawImage(this.image, this.x, this.y);
+    this.context.restore();
   }
 
   download() {
@@ -80,49 +78,56 @@ class CanvasView {
     a.download = 'download.jpeg';
     a.click();
   }
+}
 
-  translate(dx, dy) {
-    if (!this.image.src) return;
-    this.dx1 += dx;
-    this.dy1 += dy;
-    this.draw();
+class CanvasText extends CanvasView {
+  constructor(canvas, context) {
+    super(canvas, context);
+
+    this.text = '';
+    this.x2 = 40;
+    this.y2 = this.canvas.height / 2;
+    this.size = 80;
+    this.font = 'serif';
   }
 
-  rotate(degrees) {
-    if (!this.image.src) return;
-    this.degrees1 += degrees;
-    this.draw();
-  }
-
-  scale(magnification) {
-    if (!this.image.src) return;
-    this.mx1 += magnification;
-    this.my1 += magnification;
-    if (this.mx1 < 0.1 && this.my1 < 0.1) {
-      this.mx1 = 0.1;
-      this.my1 = 0.1;
-    }
-    this.draw();
+  draw() {
+    this.context.save();
+    this.context.font = `${this.size}px ${this.font}`;
+    this.context.fillText(this.text, this.x2, this.y2);
+    this.context.restore();
   }
 }
 
-const canvasView = new CanvasView(canvas, context, image);
+const canvasImage = new CanvasImage(canvas, context, image);
+const canvasText = new CanvasText(canvas, context);
 
-document.addEventListener('change', (event) => {
+const drawAll = () => {
+  context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  canvasImage.draw();
+  canvasText.draw();
+};
+
+const fileInput = document.getElementById('file');
+fileInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
 
   if (!file) return;
 
-  canvasView.load(file);
+  canvasImage.load(file);
 });
+
+image.onload = () => {
+  canvasImage.draw();
+};
 
 const form = document.getElementById('form');
 form.addEventListener('submit', (event) => {
   event.preventDefault();
 
   const input = event.currentTarget.firstElementChild;
-  canvasView.text = input.value;
-  canvasView.drawText();
+  canvasText.text = input.value;
+  canvasText.draw();
 });
 
 const downloadButton = document.getElementById('download-button');
@@ -131,59 +136,74 @@ const rotateButtons = [...document.querySelectorAll('[data-rotate]')];
 const scaleButtons = [...document.querySelectorAll('[data-scale]')];
 
 downloadButton.addEventListener('click', () => {
-  canvasView.download();
+  canvasImage.download();
 });
 
 translateButtons.forEach((translateButton) => {
   translateButton.addEventListener('click', (event) => {
+    if (!canvasImage.image.src) return;
+
     const target = event.currentTarget;
     const direction = target.dataset.translate;
     const distance = 10;
+
     switch (direction) {
       case 'up':
-        canvasView.translate(0, -distance);
+        canvasImage.translate(0, -distance);
         break;
       case 'down':
-        canvasView.translate(0, distance);
+        canvasImage.translate(0, distance);
         break;
       case 'left':
-        canvasView.translate(-distance, 0);
+        canvasImage.translate(-distance, 0);
         break;
       case 'right':
-        canvasView.translate(distance, 0);
+        canvasImage.translate(distance, 0);
         break;
       default:
         alert('エラー');
     }
+
+    drawAll();
   });
 });
 
 rotateButtons.forEach((rotateButton) => {
   rotateButton.addEventListener('click', (event) => {
+    if (!canvasImage.image.src) return;
+
     const target = event.currentTarget;
     const direction = target.dataset.rotate;
     const degees = 15;
+
     if (direction === 'right') {
-      canvasView.rotate(degees);
+      canvasImage.rotate(degees);
     } else if (direction === 'left') {
-      canvasView.rotate(-degees);
+      canvasImage.rotate(-degees);
     } else {
       alert('エラー');
     }
+
+    drawAll();
   });
 });
 
 scaleButtons.forEach((scaleButton) => {
   scaleButton.addEventListener('click', (event) => {
+    if (!canvasImage.image.src) return;
+
     const target = event.currentTarget;
     const direction = target.dataset.scale;
     const magnification = 0.2;
+
     if (direction === 'up') {
-      canvasView.scale(magnification);
+      canvasImage.scale(magnification);
     } else if (direction === 'down') {
-      canvasView.scale(-magnification);
+      canvasImage.scale(-magnification);
     } else {
       alert('エラー');
     }
+
+    drawAll();
   });
 });
