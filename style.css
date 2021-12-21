@@ -1,10 +1,6 @@
-.wrapper {
+.image-view {
   max-width: 600px;
   margin: 0 auto;
-}
-
-.image-view {
-  position: relative;
 }
 
 canvas {
@@ -13,40 +9,60 @@ canvas {
   margin-bottom: 24px;
 }
 
-.file-input {
-  margin-bottom: 40px;
-}
-
-.text-control {
-  margin-bottom: 32px;
-}
-
-.form {
-  display: flex;
-  align-items: center;
-}
-
-.form__textarea {
-  margin-right: 24px;
-}
-
-.button-group {
-  display: flex;
-  justify-content: space-between;
-}
-
-.button-group--small {
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-.button-group:not(:last-child) {
-  margin-bottom: 24px;
-}
-
 button {
   font-size: 16px;
   min-width: 120px;
   min-height: 40px;
   cursor: pointer;
+}
+
+.file-input {
+  margin-bottom: 40px;
+}
+
+.control-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.control-content {
+  min-width: 600px;
+  border: 1px solid #000;
+  padding: 16px 16px 24px;
+}
+
+.control-content:not(:last-child) {
+  margin-right: 16px;
+}
+
+.control-content__title {
+  font-size: 20px;
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.control-content__area {
+  display: block;
+  margin: 0 auto 16px;
+}
+
+.control-content__radio-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.control-content__button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.control-content__button-group--small {
+  max-width: 270px;
+  margin: 0 auto;
+}
+
+.control-content__button-group:not(:last-child) {
+  margin-bottom: 24px;
 }

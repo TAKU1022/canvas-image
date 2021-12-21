@@ -6,34 +6,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Serif+JP&family=Rampart+One&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
   </head>
   <body>
-    <div class="wrapper">
-      <div class="image-view">
-        <canvas id="canvas" width="600" height="400"></canvas>
-        <input id="file" class="file-input" type="file" accept="image/*" />
-        <button id="download-button">ダウンロード</button>
-        <div class="text-control">
-          <form id="form" class="form">
-            <input class="form__textarea" type="text" />
-            <button>テキストを描画</button>
-          </form>
+    <div class="image-view">
+      <canvas id="canvas" width="600" height="400"></canvas>
+      <input id="file" class="file-input" type="file" accept="image/*" />
+      <button id="download-button">ダウンロード</button>
+    </div>
+
+    <div class="control-wrapper">
+      <div class="control-content">
+        <p class="control-content__title">画像操作</p>
+        <div class="control-content__button-group">
+          <button data-translate="up" data-canvas="image">上へ</button>
+          <button data-translate="down" data-canvas="image">下へ</button>
+          <button data-translate="left" data-canvas="image">左へ</button>
+          <button data-translate="right" data-canvas="image">右へ</button>
         </div>
-        <div class="image-control">
-          <div class="button-group">
-            <button data-translate="up">上へ</button>
-            <button data-translate="down">下へ</button>
-            <button data-translate="left">左へ</button>
-            <button data-translate="right">右へ</button>
-          </div>
-          <div class="button-group button-group--small">
-            <button data-rotate="right">右回転</button>
-            <button data-rotate="left">左回転</button>
-          </div>
-          <div class="button-group button-group--small">
-            <button data-scale="up">拡大</button>
-            <button data-scale="down">縮小</button>
-          </div>
+        <div
+          class="
+            control-content__button-group control-content__button-group--small
+          "
+        >
+          <button data-rotate="right" data-canvas="image">右回転</button>
+          <button data-rotate="left" data-canvas="image">左回転</button>
+        </div>
+        <div
+          class="
+            control-content__button-group control-content__button-group--small
+          "
+        >
+          <button data-scale="up" data-canvas="image">拡大</button>
+          <button data-scale="down" data-canvas="image">縮小</button>
+        </div>
+      </div>
+
+      <div class="control-content">
+        <p class="control-content__title">テキスト操作</p>
+        <textarea
+          id="textarea"
+          class="control-content__area"
+          cols="50"
+          rows="5"
+        ></textarea>
+        <div class="control-content__radio-group">
+          <label
+            ><input type="radio" name="fonts" value="Noto Sans JP" />Noto Sans
+          </label>
+          <label
+            ><input type="radio" name="fonts" value="Noto Serif JP" />Noto Serif
+          </label>
+          <label
+            ><input type="radio" name="fonts" value="Rampart One" />Rampart One
+          </label>
+        </div>
+        <div class="control-content__button-group">
+          <button data-translate="up" data-canvas="text">上へ</button>
+          <button data-translate="down" data-canvas="text">下へ</button>
+          <button data-translate="left" data-canvas="text">左へ</button>
+          <button data-translate="right" data-canvas="text">右へ</button>
+        </div>
+        <div
+          class="
+            control-content__button-group control-content__button-group--small
+          "
+        >
+          <button data-rotate="right" data-canvas="text">右回転</button>
+          <button data-rotate="left" data-canvas="text">左回転</button>
+        </div>
+        <div
+          class="
+            control-content__button-group control-content__button-group--small
+          "
+        >
+          <button data-scale="up" data-canvas="text">拡大</button>
+          <button data-scale="down" data-canvas="text">縮小</button>
         </div>
       </div>
     </div>

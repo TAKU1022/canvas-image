@@ -48,6 +48,7 @@ class CanvasImage extends CanvasView {
     this.degrees = 0;
     this.mx = 1.0;
     this.my = 1.0;
+    this.isDrawn = false;
   }
 
   load(file) {
@@ -56,6 +57,7 @@ class CanvasImage extends CanvasView {
     reader.onload = (event) => {
       this.image.src = event.target.result;
     };
+    this.isDrawn = true;
   }
 
   draw() {
@@ -84,17 +86,40 @@ class CanvasText extends CanvasView {
   constructor(canvas, context) {
     super(canvas, context);
 
-    this.text = '';
-    this.x2 = 40;
+    this.textarea = '';
+    this.x2 = 0;
     this.y2 = this.canvas.height / 2;
-    this.size = 80;
-    this.font = 'serif';
+    this.fontSize = 40;
+    this.fontFamily = 'sans-serif';
+    this.lineHeight = 1.5;
+    this.fontsArray = [];
+    this.dx = 0;
+    this.dy = 0;
+    this.degrees = 0;
+    this.mx = 1.0;
+    this.my = 1.0;
+    this.isDrawn = false;
   }
 
   draw() {
     this.context.save();
-    this.context.font = `${this.size}px ${this.font}`;
-    this.context.fillText(this.text, this.x2, this.y2);
+    this.textarea === '' ? (this.isDrawn = false) : (this.isDrawn = true);
+    this.context.translate(this.dx, this.dy);
+    this.context.translate(
+      this.canvas.width / 2 + this.dx,
+      this.canvas.height / 2 + this.dy
+    );
+    this.context.rotate(calculateRadian(this.degrees));
+    this.context.scale(this.mx, this.my);
+    this.context.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+    this.context.font = `${this.fontSize}px ${this.fontFamily}`;
+    this.textarea.split('\n').forEach((text, index) => {
+      this.context.fillText(
+        text,
+        this.x2,
+        this.y2 + this.fontSize * this.lineHeight * index
+      );
+    });
     this.context.restore();
   }
 }
@@ -118,47 +143,69 @@ fileInput.addEventListener('change', (event) => {
 });
 
 image.onload = () => {
-  canvasImage.draw();
+  drawAll();
 };
 
-const form = document.getElementById('form');
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-
-  const input = event.currentTarget.firstElementChild;
-  canvasText.text = input.value;
-  canvasText.draw();
-});
-
 const downloadButton = document.getElementById('download-button');
-const translateButtons = [...document.querySelectorAll('[data-translate]')];
-const rotateButtons = [...document.querySelectorAll('[data-rotate]')];
-const scaleButtons = [...document.querySelectorAll('[data-scale]')];
+const textarea = document.getElementById('textarea');
+const fontRadioButtons = [...document.getElementsByName('fonts')];
 
 downloadButton.addEventListener('click', () => {
   canvasImage.download();
 });
 
+textarea.addEventListener('input', (event) => {
+  canvasText.textarea = event.currentTarget.value;
+  drawAll();
+});
+
+fontRadioButtons.forEach((radio) => {
+  canvasText.fontsArray.push(radio.value);
+});
+
+fontRadioButtons.forEach((radio) => {
+  radio.addEventListener('change', (event) => {
+    const fontFamilyName = event.currentTarget.value;
+    canvasText.fontFamily = fontFamilyName;
+
+    WebFont.load({
+      google: {
+        families: canvasText.fontsArray,
+      },
+      active() {
+        drawAll();
+      },
+    });
+  });
+});
+
+const translateButtons = [...document.querySelectorAll('[data-translate]')];
+const rotateButtons = [...document.querySelectorAll('[data-rotate]')];
+const scaleButtons = [...document.querySelectorAll('[data-scale]')];
+
 translateButtons.forEach((translateButton) => {
   translateButton.addEventListener('click', (event) => {
-    if (!canvasImage.image.src) return;
-
     const target = event.currentTarget;
+    const canvasName =
+      target.dataset.canvas === 'image' ? canvasImage : canvasText;
+
+    if (!canvasName.isDrawn) return;
+
     const direction = target.dataset.translate;
     const distance = 10;
 
     switch (direction) {
       case 'up':
-        canvasImage.translate(0, -distance);
+        canvasName.translate(0, -distance);
         break;
       case 'down':
-        canvasImage.translate(0, distance);
+        canvasName.translate(0, distance);
         break;
       case 'left':
-        canvasImage.translate(-distance, 0);
+        canvasName.translate(-distance, 0);
         break;
       case 'right':
-        canvasImage.translate(distance, 0);
+        canvasName.translate(distance, 0);
         break;
       default:
         alert('エラー');
@@ -170,16 +217,19 @@ translateButtons.forEach((translateButton) => {
 
 rotateButtons.forEach((rotateButton) => {
   rotateButton.addEventListener('click', (event) => {
-    if (!canvasImage.image.src) return;
-
     const target = event.currentTarget;
+    const canvasName =
+      target.dataset.canvas === 'image' ? canvasImage : canvasText;
+
+    if (!canvasName.isDrawn) return;
+
     const direction = target.dataset.rotate;
     const degees = 15;
 
     if (direction === 'right') {
-      canvasImage.rotate(degees);
+      canvasName.rotate(degees);
     } else if (direction === 'left') {
-      canvasImage.rotate(-degees);
+      canvasName.rotate(-degees);
     } else {
       alert('エラー');
     }
@@ -190,16 +240,19 @@ rotateButtons.forEach((rotateButton) => {
 
 scaleButtons.forEach((scaleButton) => {
   scaleButton.addEventListener('click', (event) => {
-    if (!canvasImage.image.src) return;
-
     const target = event.currentTarget;
+    const canvasName =
+      target.dataset.canvas === 'image' ? canvasImage : canvasText;
+
+    if (!canvasName.isDrawn) return;
+
     const direction = target.dataset.scale;
     const magnification = 0.2;
 
     if (direction === 'up') {
-      canvasImage.scale(magnification);
+      canvasName.scale(magnification);
     } else if (direction === 'down') {
-      canvasImage.scale(-magnification);
+      canvasName.scale(-magnification);
     } else {
       alert('エラー');
     }
