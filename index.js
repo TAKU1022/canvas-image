@@ -87,12 +87,12 @@ class CanvasText extends CanvasView {
     super(canvas, context);
 
     this.textarea = '';
-    this.x2 = 0;
-    this.y2 = this.canvas.height / 2;
     this.fontSize = 40;
     this.fontFamily = 'sans-serif';
     this.lineHeight = 1.5;
     this.fontsArray = [];
+    this.x = 0;
+    this.y = this.fontSize;
     this.dx = 0;
     this.dy = 0;
     this.degrees = 0;
@@ -102,25 +102,32 @@ class CanvasText extends CanvasView {
   }
 
   draw() {
-    this.context.save();
     this.textarea === '' ? (this.isDrawn = false) : (this.isDrawn = true);
-    this.context.translate(this.dx, this.dy);
-    this.context.translate(
-      this.canvas.width / 2 + this.dx,
-      this.canvas.height / 2 + this.dy
-    );
-    this.context.rotate(calculateRadian(this.degrees));
-    this.context.scale(this.mx, this.my);
-    this.context.translate(-this.canvas.width / 2, -this.canvas.height / 2);
     this.context.font = `${this.fontSize}px ${this.fontFamily}`;
+    const numberArray = this.textarea
+      .split('\n')
+      .map((text) => this.context.measureText(text).width);
+    const maxWidth = Math.max(...numberArray);
     this.textarea.split('\n').forEach((text, index) => {
+      this.context.save();
+      this.context.translate(this.dx, this.dy);
+      this.context.translate(
+        maxWidth / 2 + this.dx,
+        (this.fontSize * this.lineHeight * numberArray.length) / 2 + this.dy
+      );
+      this.context.rotate(calculateRadian(this.degrees));
+      this.context.scale(this.mx, this.my);
+      this.context.translate(
+        -maxWidth / 2,
+        -(this.fontSize * this.lineHeight * numberArray.length) / 2
+      );
       this.context.fillText(
         text,
-        this.x2,
-        this.y2 + this.fontSize * this.lineHeight * index
+        this.x,
+        this.y + this.fontSize * this.lineHeight * index
       );
+      this.context.restore();
     });
-    this.context.restore();
   }
 }
 
